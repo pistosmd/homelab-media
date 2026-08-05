@@ -41,8 +41,19 @@ adds the container's directory. **Check both repos' tables before claiming an ID
 
 ## Storage
 
-The media library lives on `/mnt/proxpool/` over NFS4 (automount). Plain `umount`
-reverts on any path access — use `unmount-proxpool --detach`.
+The media library lives on `/mnt/proxpool/`, which reaches the host pool
+`/proxpool/data` over **two transports**: NFS4 automount on the LAN
+(`192.168.1.16:/proxpool/data`, the `fstab` entry) and sshfs over
+`root@ssh.neoprax.is:/proxpool/data` off-LAN. `mount-proxpool` picks one by pinging the
+LAN address. autofs and sshfs fight over the mountpoint, so plain `umount` reverts on any
+path access — use `unmount-proxpool --detach`. Off-LAN you are moving bytes through the
+Cloudflare tunnel; don't start a large media job there without meaning to.
+
+**One subtree is not yours.** `/mnt/proxpool/Media/Documents/Medisiina/` holds the
+clinical reference corpora, bind-mounted read-only into LXC 8011. It belongs to
+`scribe-leader` and is written only by `scribe-app/scripts/deploy.sh --corpus`. A
+hand-edit there lands in the clinician's live app with no verification and no rollback.
+Everything else under the pool is `personal-ops`'.
 
 `/mnt/proxpool/Media/Music/` is served by Jellyfin and managed with Strawberry; the real
 content is under the relocated beets `MusicLibrary/`. The Lidarr/Nicotine pipeline exists
@@ -83,7 +94,8 @@ envelope/interior boundary, and the single-writer table are canonical in
 first host action**, it is not duplicated here.
 
 The short version for work in this repo: you are acting as `personal-ops`. You own the
-media containers' interiors and `/mnt/proxpool`. You do **not** own the container
+media containers' interiors and `/mnt/proxpool` — except `Media/Documents/Medisiina/`,
+see Storage above. You do **not** own the container
 envelope (`pct`), the tunnel config, or `~/.ssh/config`. Record every host mutation in
 [`../homelab/docs/CHANGELOG.md`](../homelab/docs/CHANGELOG.md) — one host, one changelog,
 and it lives in the Neopraxis repo because that is where the host-level docs are.
