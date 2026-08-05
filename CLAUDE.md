@@ -49,11 +49,24 @@ LAN address. autofs and sshfs fight over the mountpoint, so plain `umount` rever
 path access — use `unmount-proxpool --detach`. Off-LAN you are moving bytes through the
 Cloudflare tunnel; don't start a large media job there without meaning to.
 
-**One subtree is not yours.** `/mnt/proxpool/Media/Documents/Medisiina/` holds the
-clinical reference corpora, bind-mounted read-only into LXC 8011. It belongs to
-`scribe-leader` and is written only by `scribe-app/scripts/deploy.sh --corpus`. A
-hand-edit there lands in the clinician's live app with no verification and no rollback.
-Everything else under the pool is `personal-ops`'.
+**The pool has four writers, not one.** It is partitioned by subtree, canonically in
+[`../homelab/CLAUDE.md`](../homelab/CLAUDE.md#host-storage-is-a-third-category-not-a-kind-of-interior).
+Short version:
+
+| Subtree | Writer |
+|---|---|
+| `Media/Music/` | `Music library organization` |
+| `Media/Videos/`, `Media/Medical_Videos/` | `Proxpool Videos folder organization` |
+| `Media/Documents/` books, Calibre, audiobooks, the `_`-prefixed working dirs, and the non-corpus parts of `Medisiina/` + `Duodecim/` | `medical books organization` |
+| `Media/Documents/Medisiina/<corpus>/search.db` | **`scribe-leader` only**, via `deploy.sh --corpus` |
+| everything else | uncontended |
+
+**The corpus artifacts are not yours and the directory names are an interface.** All of
+`Medisiina/` is bind-mounted read-only into LXC 8011. Only a few `search.db` files are
+opened, so reorganising the loose PDFs and vaults around them is fine — but **moving or
+renaming a corpus directory silently breaks the clinician's app.** It starts, passes
+`/livez`, and serves without that corpus, because `getCorpusDb()` opens lazily and caches.
+No error will tell you.
 
 `/mnt/proxpool/Media/Music/` is served by Jellyfin and managed with Strawberry; the real
 content is under the relocated beets `MusicLibrary/`. The Lidarr/Nicotine pipeline exists
@@ -94,8 +107,9 @@ envelope/interior boundary, and the single-writer table are canonical in
 first host action**, it is not duplicated here.
 
 The short version for work in this repo: you are acting as `personal-ops`. You own the
-media containers' interiors and `/mnt/proxpool` — except `Media/Documents/Medisiina/`,
-see Storage above. You do **not** own the container
+media containers' interiors and the uncontended parts of `/mnt/proxpool` — **the pool is
+split by subtree across several curation sessions, see Storage above; check which one is
+yours before writing.** You do **not** own the container
 envelope (`pct`), the tunnel config, or `~/.ssh/config`. Record every host mutation in
 [`../homelab/docs/CHANGELOG.md`](../homelab/docs/CHANGELOG.md) — one host, one changelog,
 and it lives in the Neopraxis repo because that is where the host-level docs are.
