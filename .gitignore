@@ -1,0 +1,22 @@
+# Secrets — never commit. Only .env.example belongs in this repo.
+.env
+*.env
+!.env.example
+*.key
+*.pem
+credentials*.json
+
+# Cloudflare tunnel credentials
+*.json
+!package.json
+cert.pem
+
+# Backups pulled from the host for inspection
+*.bak
+*.bak-*
+*.tar.zst
+*.vma.*
+
+# Editor / OS
+.DS_Store
+*.swp

@@ -1,0 +1,81 @@
+services:
+  invidious:
+    image: quay.io/invidious/invidious:latest
+    restart: unless-stopped
+    # Must listen on the LAN interface, not loopback: cloudflared runs on LXC 8006
+    # and reaches this over the network. Exposure is bounded by Cloudflare Access.
+    ports:
+      - "3000:3000"
+    environment:
+      INVIDIOUS_CONFIG: |
+        db:
+          dbname: invidious
+          user: kemal
+          password: ${POSTGRES_PASSWORD}
+          host: invidious-db
+          port: 5432
+        check_tables: true
+        external_port: 443
+        domain: invidious.neoprax.is
+        https_only: true
+        hmac_key: ${HMAC_KEY}
+        invidious_companion:
+          - private_url: "http://invidious-companion:8282"
+            public_url: "https://invidious.neoprax.is/companion"
+        invidious_companion_key: ${COMPANION_KEY}
+        popular_enabled: false
+        registration_enabled: false
+        login_enabled: true
+        statistics_enabled: false
+    healthcheck:
+      test: wget -nv --tries=1 --spider http://127.0.0.1:3000/api/v1/trending || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 2
+    depends_on:
+      invidious-db:
+        condition: service_healthy
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  invidious-companion:
+    image: quay.io/invidious/invidious-companion:latest
+    restart: unless-stopped
+    environment:
+      SERVER_SECRET_KEY: ${COMPANION_KEY}
+    volumes:
+      - companion-tmp:/var/tmp/youtubei.js
+    cap_drop:
+      - ALL
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  invidious-db:
+    image: docker.io/library/postgres:14
+    restart: unless-stopped
+    volumes:
+      - postgresdata:/var/lib/postgresql/data
+      - ./sql:/config/sql:ro
+      - ./init-invidious-db.sh:/docker-entrypoint-initdb.d/init-invidious-db.sh:ro
+    environment:
+      POSTGRES_DB: invidious
+      POSTGRES_USER: kemal
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgresdata:
+  companion-tmp:
