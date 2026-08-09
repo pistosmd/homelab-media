@@ -32,7 +32,7 @@ table is a snapshot, the host is authoritative.
 | 8030 | webodm | WebODM (photogrammetry) | |
 | 8083 | library | Calibre-Web ×2 + Audiobookshelf | Exposed at `lib.neoprax.is` → `:8084` |
 | 8096 | jellyfin | Jellyfin | Privileged, NVIDIA RTX 3060 Ti passthrough. Exposed at `studium.neoprax.is` |
-| 9696 | mediarr | arr stack + qBittorrent | Behind Gluetun/ProtonVPN |
+| 9696 | mediarr | arr stack + qBittorrent | Behind Gluetun/ProtonVPN. `qbittorrent`/`nicotine`/`port-sync` share gluetun's network namespace — restart gluetun and you must restart them too. VPN watchdog installed 2026-08-09, see `lxc/9696-mediarr/` |
 | 9000 | invidious | YouTube frontend | **Planned** — see `lxc/9000-invidious/` |
 
 ID convention (shared with the Neopraxis repo, so IDs never collide): `8xxx` for

@@ -1,0 +1,14 @@
+[Unit]
+Description=Check the mediarr VPN tunnel every 5 minutes
+Documentation=https://github.com/pistosmd/homelab-media/blob/main/lxc/9696-mediarr/README.md
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=5min
+# Five minutes with a 3-failure threshold means ~15 minutes of sustained loss before
+# anything is restarted. Long enough to ride out a provider blip, short enough that the
+# next outage is measured in minutes rather than the seven weeks the last one ran.
+AccuracySec=30s
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,15 @@
+[Unit]
+Description=Watchdog for the mediarr VPN tunnel and the containers riding it
+Documentation=https://github.com/pistosmd/homelab-media/blob/main/lxc/9696-mediarr/README.md
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/vpn-watchdog.sh
+# A repair restarts four containers and waits for a tunnel; it must not be killed midway,
+# because a half-restarted group is exactly the stranded-namespace state this exists to fix.
+TimeoutStartSec=600
+
+[Install]
+WantedBy=multi-user.target
