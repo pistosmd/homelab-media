@@ -1,0 +1,25 @@
+# Navidrome — LXC 9533. Original: homelab-media/lxc/9533-navidrome/navidrome.toml
+#
+# DataFolder is on the container ROOTFS, which is local-lvm on the NVMe — never on
+# /proxpool. Navidrome keeps a SQLite index over the library, and SQLite in WAL mode needs
+# an mmap'd -shm file. An mmap page fault against an unreachable NFS server sleeps
+# uninterruptibly and survives SIGKILL; that is what hung digiKam on 2026-08-05 and forced a
+# power-off. Collection on the pool, index on local disk. This is that rule.
+DataFolder = "/var/lib/navidrome"
+
+# The whole Music subtree, mounted ro=1. MusicLibrary/ is the real beets library;
+# Lidarr/ holds 134 files despite being recorded as unused; AudacityArchive/ has no audio
+# at all, so including it costs a directory walk and nothing else.
+MusicFolder = "/mnt/music"
+
+Address = "0.0.0.0"
+Port = 4533
+
+# Scan on a schedule rather than watching: the library is on spinning disks reached over a
+# bind mount, and inotify across that is not worth the wake-ups for a collection that
+# changes when someone deliberately curates it.
+ScanSchedule = "@every 24h"
+
+# Transcoding off by default — clients that can handle FLAC should get FLAC, and the CPU
+# here is 2 cores shared with everything else on the host.
+EnableTranscodingConfig = false

@@ -34,6 +34,7 @@ table is a snapshot, the host is authoritative.
 | 8096 | jellyfin | Jellyfin | Privileged, NVIDIA RTX 3060 Ti passthrough. Exposed at `studium.neoprax.is` |
 | 9696 | mediarr | arr stack + qBittorrent | Behind Gluetun/ProtonVPN. `qbittorrent`/`nicotine`/`port-sync` share gluetun's network namespace — restart gluetun and you must restart them too. VPN watchdog installed 2026-08-09, see `lxc/9696-mediarr/` |
 | 9000 | invidious | YouTube frontend | **Planned** — see `lxc/9000-invidious/` |
+| 9533 | navidrome | Music server (Subsonic API) | `192.168.1.111`. Exposed at `auditio.neoprax.is` → `:4533`. Music bind-mounted **read-only**; SQLite index on rootfs (NVMe), never the pool. See `lxc/9533-navidrome/` |
 
 ID convention (shared with the Neopraxis repo, so IDs never collide): `8xxx` for
 services, `9xxx` for media. Pick an unused ID and record it here in the same commit that
