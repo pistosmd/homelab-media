@@ -23,7 +23,7 @@ for a container shell.
 
 ## LXC inventory — media and personal
 
-Verified against `pct list` on 2026-08-05. **Re-verify before relying on it** — this
+Verified against `pct list` on 2026-09-05. **Re-verify before relying on it** — this
 table is a snapshot, the host is authoritative.
 
 | ID | Name | Purpose | Notes |
@@ -35,6 +35,7 @@ table is a snapshot, the host is authoritative.
 | 9696 | mediarr | arr stack + qBittorrent | Behind Gluetun/ProtonVPN. `qbittorrent`/`nicotine`/`port-sync` share gluetun's network namespace — restart gluetun and you must restart them too. VPN watchdog installed 2026-08-09, see `lxc/9696-mediarr/` |
 | 9000 | invidious | YouTube frontend | **Planned** — see `lxc/9000-invidious/` |
 | 9533 | navidrome | Music server (Subsonic API) | `192.168.1.111`. Exposed at `auditio.neoprax.is` → `:4533`. Music bind-mounted **read-only**; SQLite index on rootfs (NVMe), never the pool. See `lxc/9533-navidrome/` |
+| 9999 | stash | Media organizer | `192.168.1.108`. **LAN-only, not routed, no login set.** SQLite DB + config on rootfs (NVMe), never the pool; generated/blobs on `Media/_stash/` (`mp0`). Library `Media/Stash/` (`mp1`, writable) — **contains `Medical_Videos`, 1.5 TB clinical, moved there 2026-09-05. Index-only scan authorized; generation NOT authorized; reading the index needs the owner's OK.** CPU ffmpeg only. **`lxc.idmap` maps container uid 1000 → host uid 1000**, so service and human share ownership; needs `root:1000:1`/`root:1100:1` in subuid/subgid. See `lxc/9999-stash/` |
 
 ID convention (shared with the Neopraxis repo, so IDs never collide): `8xxx` for
 services, `9xxx` for media. Pick an unused ID and record it here in the same commit that
@@ -60,6 +61,7 @@ Short version:
 | `Media/Videos/`, `Media/Medical_Videos/` | `Proxpool Videos folder organization` |
 | `Media/Documents/` books, Calibre, audiobooks, the `_`-prefixed working dirs, and the non-corpus parts of `Medisiina/` + `Duodecim/` | `medical books organization` |
 | `Media/Documents/Medisiina/<corpus>/search.db` | **`scribe-leader` only**, via `deploy.sh --corpus` |
+| `Media/Stash/` (incl. the relocated `Medical_Videos`) | LXC 9999 `stash` — see `lxc/9999-stash/` |
 | everything else | uncontended |
 
 **The corpus artifacts are not yours and the directory names are an interface.** All of
