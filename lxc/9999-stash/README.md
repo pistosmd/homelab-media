@@ -201,9 +201,11 @@ The tree carries mixed legacy modes — 47,399 files at `666`, 13,455 at `644`, 
 
 ## Open items
 
-1. **No credentials are set.** Stash starts with no login, and it is now sitting in front of
-   a 1.5 TB clinical library. It is LAN-only, but set a username and password in
-   Settings → Security — this is the first thing to do, not the last.
+1. ~~No credentials are set.~~ **Closed 2026-09-26** — a login was set in Settings → Security.
+   Verified: an unauthenticated `GET /` now returns `302` to the login page rather than `200`.
+   This mattered more than it looked: the app fronts a 1.5 TB clinical library, and by then
+   the host had joined a tailnet with `192.168.1.0/24` routed, so "LAN-only" no longer meant
+   "in the house".
 2. **DHCP reservation** for `192.168.1.108` is not yet set on the router.
 3. **`Media/Videos/Medical_Videos` is an empty stub** left behind in `videos@homelab`'s
    subtree. Harmless, but it is a name that now means nothing and will mislead someone.
