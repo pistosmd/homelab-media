@@ -55,15 +55,11 @@ Server device ID (public, needed on the phone to pair):
 
 ## Semantics — backup-shaped, deliberately
 
-Receive-only means the server never pushes changes back to the phone. Deleting a photo
-on the phone *will* propagate as a deletion here on the next sync unless ignoreDelete
-is set — if the intent is "clear phone, keep archive", set
-
-```
-pct exec 2284 -- runuser -u syncthing -- syncthing cli config folders 0aahi-kqe3v ignore-delete set true
-```
-
-(left **off** at creation; decide when the first real sync runs). PhoneSync is a
+Receive-only means the server never pushes changes back to the phone, and
+**`ignore-delete` is ON** (owner's decision, 2026-09-28): deleting a photo on the phone
+does NOT delete the archived copy here. "Clear phone, keep archive" is the intended
+workflow. Consequence: the server's copy is authoritative once synced, and the folder
+will show remote "out of sync" deletions on the phone side — that is normal. PhoneSync is a
 staging area: curation into `Photos/YYYY/MM/DD` remains a human/digiKam step.
 
 ## Restore
