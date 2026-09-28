@@ -22,7 +22,7 @@ timeline. Created 2026-09-28.
   `sync` is reserved by base Debian, hence the longer name).
 - Config + index on the rootfs at `~syncthing/.local/state/syncthing/` — **never the
   pool** (SQLite/LevelDB rule).
-- One folder: id `phone-photos`, path `/data`, type **receiveonly**. The default
+- One folder: id `0aahi-kqe3v` (the phone's auto-generated ID, label "Pixel Camera"), path `/data`, type **receiveonly**. The default
   `~/Sync` folder was deleted.
 - Hardening: global announce **off**, relays **off**, NAT traversal **off**. The
   instance is reachable only on LAN/tailnet (`tcp://192.168.1.30:22000`); nothing is
@@ -50,7 +50,7 @@ Server device ID (public, needed on the phone to pair):
 
    ```
    pct exec 2284 -- runuser -u syncthing -- syncthing cli config devices add --device-id <PHONE-ID> --name phone
-   pct exec 2284 -- runuser -u syncthing -- syncthing cli config folders phone-photos devices add --device-id <PHONE-ID>
+   pct exec 2284 -- runuser -u syncthing -- syncthing cli config folders 0aahi-kqe3v devices add --device-id <PHONE-ID>
    ```
 
 ## Semantics — backup-shaped, deliberately
@@ -60,7 +60,7 @@ on the phone *will* propagate as a deletion here on the next sync unless ignoreD
 is set — if the intent is "clear phone, keep archive", set
 
 ```
-pct exec 2284 -- runuser -u syncthing -- syncthing cli config folders phone-photos ignore-delete set true
+pct exec 2284 -- runuser -u syncthing -- syncthing cli config folders 0aahi-kqe3v ignore-delete set true
 ```
 
 (left **off** at creation; decide when the first real sync runs). PhoneSync is a
