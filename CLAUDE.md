@@ -28,14 +28,15 @@ table is a snapshot, the host is authoritative.
 
 | ID | Name | Purpose | Notes |
 |---|---|---|---|
-| 2283 | immich | Photo library | |
+| 2283 | immich | Photo library + phone auto-backup | `192.168.1.177` (DHCP — wants a reservation). Revived 2026-09-28 after ~10 months down: idmap added (uid 1000→1000, gid 1000→1100), docker boot-race drop-in, postgres wiped fresh (was 74 G bloat, disk 100 %). Uploads on the pool at `Media/Pictures/Photos/immich-uploads`; DB on rootfs. See `lxc/2283-immich/` |
+| 2284 | syncthing | Phone photo raw-file sync | `192.168.1.30` (static). Receive-only into `Media/Pictures/PhoneSync`; discovery/relays off, LAN/tailnet only; same idmap as 9999. Created 2026-09-28. See `lxc/2284-syncthing/` |
 | 8030 | webodm | WebODM (photogrammetry) | |
 | 8083 | library | Calibre-Web ×2 + Audiobookshelf | Exposed at `lib.neoprax.is` → `:8084` |
 | 8096 | jellyfin | Jellyfin | Privileged, NVIDIA RTX 3060 Ti passthrough. Exposed at `studium.neoprax.is` |
 | 9696 | mediarr | arr stack + qBittorrent | Behind Gluetun/ProtonVPN. `qbittorrent`/`nicotine`/`port-sync` share gluetun's network namespace — restart gluetun and you must restart them too. VPN watchdog installed 2026-08-09, see `lxc/9696-mediarr/` |
 | 9000 | invidious | YouTube frontend | **Planned** — see `lxc/9000-invidious/` |
 | 9533 | navidrome | Music server (Subsonic API) | `192.168.1.111`. Exposed at `auditio.neoprax.is` → `:4533`. Music bind-mounted **read-only**; SQLite index on rootfs (NVMe), never the pool. See `lxc/9533-navidrome/` |
-| 9999 | stash | Media organizer | `192.168.1.108`. **LAN-only, not routed, no login set.** SQLite DB + config on rootfs (NVMe), never the pool; generated/blobs on `Media/_stash/` (`mp0`). Library `Media/Stash/` (`mp1`, writable) — **contains `Medical_Videos`, 1.5 TB clinical, moved there 2026-09-05. Index-only scan authorized; generation NOT authorized; reading the index needs the owner's OK.** CPU ffmpeg only. **`lxc.idmap` maps container uid 1000 → host uid 1000**, so service and human share ownership; needs `root:1000:1`/`root:1100:1` in subuid/subgid. See `lxc/9999-stash/` |
+| 9999 | stash | Media organizer | `192.168.1.108`. **LAN-only, not routed; login required since 2026-09-26.** SQLite DB + config on rootfs (NVMe), never the pool; generated/blobs on `Media/_stash/` (`mp0`). Library `Media/Stash/` (`mp1`, writable) — **contains `Medical_Videos`, 1.5 TB clinical, moved there 2026-09-05. Index-only scan authorized; generation NOT authorized; reading the index needs the owner's OK.** CPU ffmpeg only. **`lxc.idmap` maps container uid 1000 → host uid 1000**, so service and human share ownership; needs `root:1000:1`/`root:1100:1` in subuid/subgid. See `lxc/9999-stash/` |
 
 ID convention (shared with the Neopraxis repo, so IDs never collide): `8xxx` for
 services, `9xxx` for media. Pick an unused ID and record it here in the same commit that
